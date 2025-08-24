@@ -1,26 +1,84 @@
 // rgb_strip.h
 // control a multicolor led strip
+// DEPRECATED - use rgb_strip_bus instead
 
 #ifndef _RGB_STRIP_H_
 #define _RGB_STRIP_H_
 
-#include <dev_rgb_base.h>
-// included in the former
-//#define FASTLED_INTERRUPT_RETRY_COUNT 0
-//#include <FastLED.h>
+// FastLED compatibility for deprecated rgb_strip
+#include "rgb_color.h"
 
+#include <device.h>
 
-class RGB_Strip : public RGB_Base {
-    private:
+#define ALL_LEDS -16
+
+// Deprecated RGB_Strip class using custom CRGB compatibility layer
+class RGB_Strip : public Device {
+    protected:
+        int _led_count=0;
+        CRGB avg_color;
         CRGB *leds;
         CLEDController *controller;
     public:
         RGB_Strip(const char* name, int _led_count, CLEDController& _controller) 
-        : RGB_Base(name, _led_count) {
+        : Device(name) {
+            this->_led_count = _led_count;
             controller = &_controller;
             set_pollrate_us(10000); // give update chance - TODO: check if necessary
             leds = controller->leds();
         }
+        
+        RGB_Strip& high() {
+            if((uint16_t)avg_color.r+avg_color.g+avg_color.b>0) {
+                return *this; // if something is on, do nothing
+            }
+            return set_color(CRGB::White);
+        }
+        RGB_Strip& on() { return high(); }
+        RGB_Strip& low() {
+            return set_color(CRGB::Black);
+        }
+        RGB_Strip& off() { return low(); }
+        RGB_Strip& set_color(CRGB color) {
+            return set_color(ALL_LEDS, color, true);
+        }
+        RGB_Strip& set_color_noshow(CRGB color) {
+            return set_color(ALL_LEDS, color, false);
+        }
+
+        bool read_color(const Ustring& colorstr, CRGB& color);
+
+        RGB_Strip& set_colorstr(int lednr, const Ustring& color, bool _show=true);
+        RGB_Strip& set_colorstr(const Ustring& color, bool _show=true);
+
+        RGB_Strip& set_color( int lednr, CRGB color, bool _show=true) {
+            if(!started()) return *this;
+            if(lednr<0) {
+                if(lednr==ALL_LEDS) {
+                    for(int nr=0; nr<led_count(); nr++) 
+                        process_color(nr, color, false);
+                    if(_show) show();
+                } else { // push front
+                    push_front(color, _show);
+                }
+            } else if (lednr >= led_count()) {
+                push_back(color, _show);
+            } else {
+                process_color(lednr, color, _show);
+            }
+            // update values with last color set
+            value(0).from(avg_color.getLuma()>0?str_on:str_off);
+            value(2).from((int)avg_color.getLuma());
+            value(4).printf("%02x%02x%02x", avg_color.r, avg_color.g, avg_color.b);
+            return *this;
+        }
+
+        int led_count() {
+            return _led_count;
+        }
+        void push_front(CRGB color, bool _show=true);
+        void push_back(CRGB color, bool _show=true);
+
         void start() {
             _started = true;
             controller->init(); // re-init, might be important if using onboard-led
@@ -56,6 +114,8 @@ class RGB_Strip : public RGB_Base {
             }
             avg_color = CRGB(avg_r/lc, avg_g/lc, avg_b/lc);
         }
+
+        virtual bool measure() { show(); return true; } // give control to library on regular basis
 };
 
 #endif // _RGB_STRIP_H_
