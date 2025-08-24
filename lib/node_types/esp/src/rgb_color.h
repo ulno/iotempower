@@ -46,6 +46,28 @@ struct CRGB {
     inline const uint8_t& operator[](uint8_t index) const {
         return raw[index];
     }
+
+    // Color constants - using static const approach for better compatibility
+    static const CRGB Black;
+    static const CRGB White;
+    static const CRGB Red;
+    static const CRGB Green;
+    static const CRGB Blue;
+    static const CRGB Yellow;
+    static const CRGB Cyan;
+    static const CRGB Magenta;
+    static const CRGB Purple;
+    static const CRGB Orange;
+    static const CRGB Pink;
+    static const CRGB DeepPink;
+    static const CRGB Brown;
+    static const CRGB Gold;
+    static const CRGB Grey;
+    static const CRGB Gray;
+    static const CRGB LightGrey;
+    static const CRGB LightGray;
+    static const CRGB LightBlue;
+    static const CRGB LightGreen;
 };
 
 // FastLED-compatible color constants using macros for simplicity
@@ -70,29 +92,27 @@ struct CRGB {
 #define CRGB_LIGHTBLUE CRGB(173, 216, 230)
 #define CRGB_LIGHTGREEN CRGB(144, 238, 144)
 
-// Create a namespace to mimic FastLED's CRGB::Color syntax
-namespace CRGB {
-    const ::CRGB Black = CRGB_BLACK;
-    const ::CRGB White = CRGB_WHITE;
-    const ::CRGB Red = CRGB_RED;
-    const ::CRGB Green = CRGB_GREEN;
-    const ::CRGB Blue = CRGB_BLUE;
-    const ::CRGB Yellow = CRGB_YELLOW;
-    const ::CRGB Cyan = CRGB_CYAN;
-    const ::CRGB Magenta = CRGB_MAGENTA;
-    const ::CRGB Purple = CRGB_PURPLE;
-    const ::CRGB Orange = CRGB_ORANGE;
-    const ::CRGB Pink = CRGB_PINK;
-    const ::CRGB DeepPink = CRGB_DEEPPINK;
-    const ::CRGB Brown = CRGB_BROWN;
-    const ::CRGB Gold = CRGB_GOLD;
-    const ::CRGB Grey = CRGB_GREY;
-    const ::CRGB Gray = CRGB_GRAY;
-    const ::CRGB LightGrey = CRGB_LIGHTGREY;
-    const ::CRGB LightGray = CRGB_LIGHTGRAY;
-    const ::CRGB LightBlue = CRGB_LIGHTBLUE;
-    const ::CRGB LightGreen = CRGB_LIGHTGREEN;
-}
+// Define the color constants outside the class
+const CRGB CRGB::Black = CRGB_BLACK;
+const CRGB CRGB::White = CRGB_WHITE;
+const CRGB CRGB::Red = CRGB_RED;
+const CRGB CRGB::Green = CRGB_GREEN;
+const CRGB CRGB::Blue = CRGB_BLUE;
+const CRGB CRGB::Yellow = CRGB_YELLOW;
+const CRGB CRGB::Cyan = CRGB_CYAN;
+const CRGB CRGB::Magenta = CRGB_MAGENTA;
+const CRGB CRGB::Purple = CRGB_PURPLE;
+const CRGB CRGB::Orange = CRGB_ORANGE;
+const CRGB CRGB::Pink = CRGB_PINK;
+const CRGB CRGB::DeepPink = CRGB_DEEPPINK;
+const CRGB CRGB::Brown = CRGB_BROWN;
+const CRGB CRGB::Gold = CRGB_GOLD;
+const CRGB CRGB::Grey = CRGB_GREY;
+const CRGB CRGB::Gray = CRGB_GRAY;
+const CRGB CRGB::LightGrey = CRGB_LIGHTGREY;
+const CRGB CRGB::LightGray = CRGB_LIGHTGRAY;
+const CRGB CRGB::LightBlue = CRGB_LIGHTBLUE;
+const CRGB CRGB::LightGreen = CRGB_LIGHTGREEN;
 
 // Utility functions - compatible with FastLED
 inline CRGB blend(const CRGB& color1, const CRGB& color2, uint8_t scale) {
