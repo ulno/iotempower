@@ -6,6 +6,9 @@
 
 #include <NeoPixelBus.h>
 
+// Type alias for backward compatibility - CRGB is now RgbColor
+typedef RgbColor CRGB;
+
 // Color constants using RgbColor
 namespace NeoColorConsts {
     const RgbColor Black(0, 0, 0);
