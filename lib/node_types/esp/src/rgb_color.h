@@ -33,28 +33,6 @@ struct CRGB {
         return *this;
     }
 
-    // Color constants - compatible with FastLED
-    static const CRGB Black;
-    static const CRGB White;
-    static const CRGB Red;
-    static const CRGB Green;
-    static const CRGB Blue;
-    static const CRGB Yellow;
-    static const CRGB Cyan;
-    static const CRGB Magenta;
-    static const CRGB Purple;
-    static const CRGB Orange;
-    static const CRGB Pink;
-    static const CRGB DeepPink;
-    static const CRGB Brown;
-    static const CRGB Gold;
-    static const CRGB Grey;
-    static const CRGB Gray;
-    static const CRGB LightGrey;
-    static const CRGB LightGray;
-    static const CRGB LightBlue;
-    static const CRGB LightGreen;
-
     // Utility functions - compatible with FastLED
     uint8_t getLuma() const {
         // Use same formula as FastLED
@@ -70,27 +48,51 @@ struct CRGB {
     }
 };
 
-// Color constant definitions
-const CRGB CRGB::Black(0, 0, 0);
-const CRGB CRGB::White(255, 255, 255);
-const CRGB CRGB::Red(255, 0, 0);
-const CRGB CRGB::Green(0, 255, 0);
-const CRGB CRGB::Blue(0, 0, 255);
-const CRGB CRGB::Yellow(255, 255, 0);
-const CRGB CRGB::Cyan(0, 255, 255);
-const CRGB CRGB::Magenta(255, 0, 255);
-const CRGB CRGB::Purple(128, 0, 128);
-const CRGB CRGB::Orange(255, 165, 0);
-const CRGB CRGB::Pink(255, 192, 203);
-const CRGB CRGB::DeepPink(255, 20, 147);
-const CRGB CRGB::Brown(165, 42, 42);
-const CRGB CRGB::Gold(255, 215, 0);
-const CRGB CRGB::Grey(128, 128, 128);
-const CRGB CRGB::Gray(128, 128, 128);
-const CRGB CRGB::LightGrey(211, 211, 211);
-const CRGB CRGB::LightGray(211, 211, 211);
-const CRGB CRGB::LightBlue(173, 216, 230);
-const CRGB CRGB::LightGreen(144, 238, 144);
+// FastLED-compatible color constants using macros for simplicity
+#define CRGB_BLACK    CRGB(0, 0, 0)
+#define CRGB_WHITE    CRGB(255, 255, 255) 
+#define CRGB_RED      CRGB(255, 0, 0)
+#define CRGB_GREEN    CRGB(0, 255, 0)
+#define CRGB_BLUE     CRGB(0, 0, 255)
+#define CRGB_YELLOW   CRGB(255, 255, 0)
+#define CRGB_CYAN     CRGB(0, 255, 255)
+#define CRGB_MAGENTA  CRGB(255, 0, 255)
+#define CRGB_PURPLE   CRGB(128, 0, 128)
+#define CRGB_ORANGE   CRGB(255, 165, 0)
+#define CRGB_PINK     CRGB(255, 192, 203)
+#define CRGB_DEEPPINK CRGB(255, 20, 147)
+#define CRGB_BROWN    CRGB(165, 42, 42)
+#define CRGB_GOLD     CRGB(255, 215, 0)
+#define CRGB_GREY     CRGB(128, 128, 128)
+#define CRGB_GRAY     CRGB(128, 128, 128)
+#define CRGB_LIGHTGREY CRGB(211, 211, 211)
+#define CRGB_LIGHTGRAY CRGB(211, 211, 211)
+#define CRGB_LIGHTBLUE CRGB(173, 216, 230)
+#define CRGB_LIGHTGREEN CRGB(144, 238, 144)
+
+// Create a namespace to mimic FastLED's CRGB::Color syntax
+namespace CRGB {
+    const ::CRGB Black = CRGB_BLACK;
+    const ::CRGB White = CRGB_WHITE;
+    const ::CRGB Red = CRGB_RED;
+    const ::CRGB Green = CRGB_GREEN;
+    const ::CRGB Blue = CRGB_BLUE;
+    const ::CRGB Yellow = CRGB_YELLOW;
+    const ::CRGB Cyan = CRGB_CYAN;
+    const ::CRGB Magenta = CRGB_MAGENTA;
+    const ::CRGB Purple = CRGB_PURPLE;
+    const ::CRGB Orange = CRGB_ORANGE;
+    const ::CRGB Pink = CRGB_PINK;
+    const ::CRGB DeepPink = CRGB_DEEPPINK;
+    const ::CRGB Brown = CRGB_BROWN;
+    const ::CRGB Gold = CRGB_GOLD;
+    const ::CRGB Grey = CRGB_GREY;
+    const ::CRGB Gray = CRGB_GRAY;
+    const ::CRGB LightGrey = CRGB_LIGHTGREY;
+    const ::CRGB LightGray = CRGB_LIGHTGRAY;
+    const ::CRGB LightBlue = CRGB_LIGHTBLUE;
+    const ::CRGB LightGreen = CRGB_LIGHTGREEN;
+}
 
 // Utility functions - compatible with FastLED
 inline CRGB blend(const CRGB& color1, const CRGB& color2, uint8_t scale) {
@@ -108,34 +110,41 @@ typedef int32_t accum88;
 
 // HSV color struct - compatible with FastLED CHSV
 struct CHSV {
-    uint8_t h, s, v;
+    union {
+        struct {
+            uint8_t h, s, v;
+        };
+        struct {
+            uint8_t hue, sat, val;
+        };
+    };
     
     inline CHSV() : h(0), s(0), v(0) {}
     inline CHSV(uint8_t hue, uint8_t saturation, uint8_t value) : h(hue), s(saturation), v(value) {}
     
-    // Convert HSV to RGB - simplified conversion
-    CRGB toRGB() const {
+    // Convert HSV to RGB - simplified conversion compatible with FastLED
+    operator CRGB() const {
         uint8_t region, remainder, p, q, t;
-        uint8_t hue = h, sat = s, val = v;
+        uint8_t hue_val = h, sat_val = s, val_val = v;
         
-        if (sat == 0) {
-            return CRGB(val, val, val);
+        if (sat_val == 0) {
+            return CRGB(val_val, val_val, val_val);
         }
         
-        region = hue / 43;
-        remainder = (hue - (region * 43)) * 6;
+        region = hue_val / 43;
+        remainder = (hue_val - (region * 43)) * 6;
         
-        p = (val * (255 - sat)) >> 8;
-        q = (val * (255 - ((sat * remainder) >> 8))) >> 8;
-        t = (val * (255 - ((sat * (255 - remainder)) >> 8))) >> 8;
+        p = (val_val * (255 - sat_val)) >> 8;
+        q = (val_val * (255 - ((sat_val * remainder) >> 8))) >> 8;
+        t = (val_val * (255 - ((sat_val * (255 - remainder)) >> 8))) >> 8;
         
         switch (region) {
-            case 0:  return CRGB(val, t, p);
-            case 1:  return CRGB(q, val, p);
-            case 2:  return CRGB(p, val, t);
-            case 3:  return CRGB(p, q, val);
-            case 4:  return CRGB(t, p, val);
-            default: return CRGB(val, p, q);
+            case 0:  return CRGB(val_val, t, p);
+            case 1:  return CRGB(q, val_val, p);
+            case 2:  return CRGB(p, val_val, t);
+            case 3:  return CRGB(p, q, val_val);
+            case 4:  return CRGB(t, p, val_val);
+            default: return CRGB(val_val, p, q);
         }
     }
 };
