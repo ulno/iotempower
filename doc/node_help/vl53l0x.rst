@@ -33,6 +33,12 @@ Parameters
 
 - ``.precision(precision)``: alias for with_precision()
 
+- ``.filter_binarize(threshold, "high_word", "low_word")``: convert distance readings
+  to binary output based on threshold distance
+
+- ``filter_function``: specify a preprocessor for measured values
+  (see `filter <filter.rst>`_)
+
 Example
 -------
 
@@ -48,10 +54,17 @@ Example
 
     vl53l0x(long_distance, true, true);
 
+..  code-block:: cpp
+
+    vl53l0x(proximity, false, false)
+        .filter_binarize(500, "close", "far");
+
 The first example creates a standard VL53L0X sensor with default settings.
 The second example enables long range mode and sets precision to 5mm.
 The third example enables both long range and high accuracy modes for
 maximum range with best possible precision.
+The fourth example uses the sensor as a proximity detector, sending "close"
+when objects are within 500mm and "far" when beyond that distance.
 
 Wiring
 ------
