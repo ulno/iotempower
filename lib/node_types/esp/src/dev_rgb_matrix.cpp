@@ -241,9 +241,9 @@ void RGB_Matrix::gradient_row( RgbColor startcolor, RgbColor endcolor,
     if(startx+w >= width) w=width-startx;
     if(starty+h >= height) h=height-starty;
 
-    saccum87 rdistance87;
-    saccum87 gdistance87;
-    saccum87 bdistance87;
+    rgbcolor_saccum87 rdistance87;
+    rgbcolor_saccum87 gdistance87;
+    rgbcolor_saccum87 bdistance87;
 
     rdistance87 = (endcolor.R - startcolor.R) << 7;
     gdistance87 = (endcolor.G - startcolor.G) << 7;
@@ -252,17 +252,17 @@ void RGB_Matrix::gradient_row( RgbColor startcolor, RgbColor endcolor,
     uint16_t pixeldistance = w;
     int16_t divisor = pixeldistance ? pixeldistance : 1;
 
-    saccum87 rdelta87 = rdistance87 / divisor;
-    saccum87 gdelta87 = gdistance87 / divisor;
-    saccum87 bdelta87 = bdistance87 / divisor;
+    rgbcolor_saccum87 rdelta87 = rdistance87 / divisor;
+    rgbcolor_saccum87 gdelta87 = gdistance87 / divisor;
+    rgbcolor_saccum87 bdelta87 = bdistance87 / divisor;
 
     rdelta87 *= 2;
     gdelta87 *= 2;
     bdelta87 *= 2;
 
-    accum88 r88 = startcolor.R << 8;
-    accum88 g88 = startcolor.G << 8;
-    accum88 b88 = startcolor.B << 8;
+    rgbcolor_accum88 r88 = startcolor.R << 8;
+    rgbcolor_accum88 g88 = startcolor.G << 8;
+    rgbcolor_accum88 b88 = startcolor.B << 8;
     for( int x = startx; x < startx + w; x++) {
         RgbColor color( r88 >> 8, g88 >> 8, b88 >> 8);
         for( int y = starty; y < starty + h; y++) { 
@@ -283,9 +283,9 @@ void RGB_Matrix::gradient_column( RgbColor startcolor, RgbColor endcolor,
     if(startx+w >= width) w=width-startx;
     if(starty+h >= height) h=height-starty;
 
-    saccum87 rdistance87;
-    saccum87 gdistance87;
-    saccum87 bdistance87;
+    rgbcolor_saccum87 rdistance87;
+    rgbcolor_saccum87 gdistance87;
+    rgbcolor_saccum87 bdistance87;
 
     rdistance87 = (endcolor.R - startcolor.R) << 7;
     gdistance87 = (endcolor.G - startcolor.G) << 7;
@@ -294,17 +294,17 @@ void RGB_Matrix::gradient_column( RgbColor startcolor, RgbColor endcolor,
     uint16_t pixeldistance = w;
     int16_t divisor = pixeldistance ? pixeldistance : 1;
 
-    saccum87 rdelta87 = rdistance87 / divisor;
-    saccum87 gdelta87 = gdistance87 / divisor;
-    saccum87 bdelta87 = bdistance87 / divisor;
+    rgbcolor_saccum87 rdelta87 = rdistance87 / divisor;
+    rgbcolor_saccum87 gdelta87 = gdistance87 / divisor;
+    rgbcolor_saccum87 bdelta87 = bdistance87 / divisor;
 
     rdelta87 *= 2;
     gdelta87 *= 2;
     bdelta87 *= 2;
 
-    accum88 r88 = startcolor.R << 8;
-    accum88 g88 = startcolor.G << 8;
-    accum88 b88 = startcolor.B << 8;
+    rgbcolor_accum88 r88 = startcolor.R << 8;
+    rgbcolor_accum88 g88 = startcolor.G << 8;
+    rgbcolor_accum88 b88 = startcolor.B << 8;
     for( int y = starty; y < starty + h; y++) {
         RgbColor color( r88 >> 8, g88 >> 8, b88 >> 8);
         for( int x = startx; x < startx + w; x++) { 

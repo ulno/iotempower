@@ -4,47 +4,44 @@
 #ifndef _RGB_BASE_H_
 #define _RGB_BASE_H_
 
-// For rgb_strip_bus: use NeoPixelBus RgbColor
-// For rgb_strip (deprecated): still use FastLED CRGB
-#include <NeoPixelBus.h>
-#include "neopixel_color_utils.h"
 
 #include <device.h>
+#include "rgb_color.h"
 
 #define ALL_LEDS -16
 
 class RGB_Base : public Device {
     protected:
         int _led_count=0;
-        RgbColor avg_color;
+    RGB_Color avg_color;
     public:
         RGB_Base(const char* name, int led_count);
         RGB_Base& high() {
-            if((uint16_t)avg_color.R+avg_color.G+avg_color.B>0) {
+            if((uint16_t)avg_color.r+avg_color.g+avg_color.b>0) {
                 return *this; // if something is on, do nothing
             }
-            return set_color(NeoColorConsts::White); // else switch to white TODO: make on-brightness configurable
+            return set_color(RGB_Color::White); // else switch to white TODO: make on-brightness configurable
         }
         RGB_Base& on() { return high(); }
         RGB_Base& low() {
-            return set_color(NeoColorConsts::Black);
+            return set_color(RGB_Color::Black);
         }
         RGB_Base& off() { return low(); }
-        RGB_Base& set_color(RgbColor color) {
+        RGB_Base& set_color(RGB_Color color) {
             return set_color(ALL_LEDS, color, true);
         }
-        RGB_Base& set_color_noshow(RgbColor color) {
+        RGB_Base& set_color_noshow(RGB_Color color) {
             return set_color(ALL_LEDS, color, false);
         }
 
-        bool read_color(const Ustring& colorstr, RgbColor& color); // TODO: make static
+    bool read_color(const Ustring& colorstr, RGB_Color& color); // TODO: make static
 
-        RGB_Base& set_colorstr(int lednr, const Ustring& color, bool _show=true);
-        RGB_Base& set_colorstr(const Ustring& color, bool _show=true);
+    RGB_Base& set_colorstr(int lednr, const Ustring& color, bool _show=true);
+    RGB_Base& set_colorstr(const Ustring& color, bool _show=true);
 
 // TODO: implement setting a bar (percentage or number of leds at once)
 
-        RGB_Base& set_color( int lednr, RgbColor color, bool _show=true) {
+    RGB_Base& set_color( int lednr, RGB_Color color, bool _show=true) {
             if(!started()) return *this;
             if(lednr<0) {
                 if(lednr==ALL_LEDS) {
@@ -62,29 +59,29 @@ class RGB_Base : public Device {
             // update values with last color set
             // TODO: make this reporting skipable
             // TODO: seems like also on and off should be ignored for home-assistant
-            value(0).from(getLuma(avg_color)>0?str_on:str_off);
-            value(2).from((int)getLuma(avg_color));
-            value(4).printf("%02x%02x%02x", avg_color.R, avg_color.G, avg_color.B);
+            value(0).from(avg_color.getLuma()>0?str_on:str_off);
+            value(2).from((int)avg_color.getLuma());
+            value(4).printf("%02x%02x%02x", avg_color.r, avg_color.g, avg_color.b);
             return *this;
         }
 
         int led_count() {
             return _led_count;
         }
-        void push_front(RgbColor color, bool _show=true);
-        void push_back(RgbColor color, bool _show=true);
+    void push_front(RGB_Color color, bool _show=true);
+    void push_back(RGB_Color color, bool _show=true);
 
         // these 4 need be re-implemented
         virtual void start() {
             // keep _started at false
         }
 
-        virtual void process_color(int lednr, RgbColor color, bool _show=true) {
+        virtual void process_color(int lednr, RGB_Color color, bool _show=true) {
             avg_color = color; // in strip, real average is computed
             // show not evaluated in single led case (but in rgb_strip)
         }
 
-        virtual RgbColor get_color(int lednr) {
+        virtual RGB_Color get_color(int lednr) {
             return avg_color;
         }
 
