@@ -932,38 +932,16 @@ void configureTime() {
     ulog(F("Time synchronized after %u seconds."), seconds);
 }
 
-void onWifiDisconnect(
-////AsyncMqttClient disabled in favor of PubSubClient
-//#ifdef ESP32
-//    WiFiEvent_t event, WiFiEventInfo_t info
-//#else
-//    const WiFiEventStationModeDisconnected &event
-//#endif
-        ) {
+void onWifiDisconnect() {
     wifi_connected = false;
-//    mqtt_just_connected = false;
     Serial.println(F("Disconnected from Wi-Fi."));
-//    if(!reconfig_mode_active) {
-//        mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while
-//                                     // reconnecting to Wi-Fi
-//    }
-//    wifiReconnectTimer.once(2, connectToWifi);
 }
 
 
-void onWifiConnect(
-////AsyncMqttClient disabled in favor of PubSubClient
-//#ifdef ESP32
-//    WiFiEvent_t event, WiFiEventInfo_t info
-//#else
-//    const WiFiEventStationModeGotIP &event
-//#endif
-        ) {
+void onWifiConnect() {
     IPAddress ip_obj = WiFi.localIP();
     ulog(F("Connected to WiFi with IP: %s"), ip_obj.toString().c_str());
     wifi_connected = true;
-    //mqtt_connected = false; // trigger reconnect <- should detect automatically
-    //init_mqtt();
 
     // TODO: enable PJON, when UDP works on esp8266 
     // // connect to PJON network
@@ -1016,84 +994,6 @@ void onWifiConnect(
     // pjon_bus.send_packet(1, b.buffer(), b.length()); // id 1 is gateway
 
 }
-
-////AsyncMqttClient disabled in favor of PubSubClient
-// void onMqttConnect(bool sessionPresent) {
-//     Serial.println(F("Connected to MQTT."));
-//     Serial.print(F("Session present: "));
-//     Serial.println(sessionPresent);
-
-//     device_manager.subscribe(mqttClient, node_topic);
-//     mqtt_just_connected = true;
-// }
-//
-// void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
-//     Serial.println(F("Disconnected from MQTT."));
-//
-//     mqtt_just_connected = false;
-//
-//     if (WiFi.isConnected()) {
-//         mqttReconnectTimer.once(2, init_mqtt);
-//     }
-// }
-//
-// void onMqttSubscribe(uint16_t packetId, uint8_t qos) {
-//     Serial.print(F("Subscribe acknowledged."));
-//     Serial.print(F("  packetId: "));
-//     Serial.print(packetId);
-//     Serial.print(F("  qos: "));
-//     Serial.println(qos);
-// }
-
-// void onMqttUnsubscribe(uint16_t packetId) {
-//     Serial.print(F("Unsubscribe acknowledged."));
-//     Serial.print(F("  packetId: "));
-//     Serial.println(packetId);
-// }
-
-// void onMqttMessage(char *topic, char *payload,
-//                    AsyncMqttClientMessageProperties properties, size_t len,
-//                    size_t index, size_t total) {
-//     Serial.print(F("Publish received."));
-//     Serial.print(F("  topic: "));
-//     Serial.print(topic);
-//     Serial.print(F("  qos: "));
-//     Serial.print(properties.qos);
-//     Serial.print(F("  dup: "));
-//     Serial.print(properties.dup);
-//     Serial.print(F("  retain: "));
-//     Serial.print(properties.retain);
-//     Serial.print(F("  len: "));
-//     Serial.print(len);
-//     Serial.print(F("  index: "));
-//     Serial.print(index);
-//     Serial.print(F("  total: "));
-//     Serial.print(total);
-
-//     Ustring utopic(topic);
-//     utopic.remove(0, node_topic.length() + 1);
-//     Ustring upayload(payload, (unsigned int)total);
-
-//     Serial.print(F(" payload: >"));
-//     Serial.print(upayload.as_cstr());
-//     Serial.println(F("<"));
-    
-//     device_manager.receive(utopic, upayload);
-// }
-
-// void onMqttPublish(uint16_t packetId) {
-//     Serial.println(F("Publish acknowledged."));
-//     Serial.print(F("  packetId: "));
-//     Serial.println(packetId);
-// }
-
-
-// __attribute__((constructor)) void early_init() {
-//  //   ulog(F("Free memory: %ld"),ESP.getFreeHeap());
-//     ulog();
-//     ulog();
-//     ulog();
-// }
 
 /**
  * @brief Arduino setup function - runs once at boot
@@ -1160,19 +1060,6 @@ void setup() {
 
     setup_ota();
 
-//    WiFi.disconnect(true);
-//    delay(10);
-
-    ////AsyncMqttClient disabled in favor of PubSubClient
-    // // Try already to bring up WiFi
-    // #ifdef ESP32    
-    // WiFi.onEvent(onWifiConnect, WiFiEvent_t::SYSTEM_EVENT_STA_GOT_IP);
-    // WiFi.onEvent(onWifiDisconnect, WiFiEvent_t::SYSTEM_EVENT_STA_DISCONNECTED);
-    // #else
-    // wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
-    // wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
-    // #endif
-
     connectToWifi();
 
     #ifdef MQTT_USE_TLS 
@@ -1185,11 +1072,8 @@ void setup() {
                                 + String(F(HOSTNAME)) + String(F("/"));
 
         if(iotempower_init) iotempower_init(); // call user init from setup.cpp
-//        ulog("Debug: before dev start"); // TODO: enable based on debug level
         device_manager.start(); // call start of all devices
-//        ulog("Debug: after dev start"); // TODO: enable based on debug level
         if(iotempower_start) iotempower_start(); // call user start from setup.cpp
-        // init_mqtt(); //AsyncMqttClient disabled in favor of PubSubClient
     } else {  // do something to show that we are in adopt mode
         #ifdef ID_LED
             // enable flashing that light
@@ -1303,11 +1187,6 @@ void loop() {
         device_manager.update(in_precision_interval);
         if(!in_precision_interval) {
             current_time = millis(); // device update might have taken time, so update (if in precision interval they shoudl barely use time)
-            ////AsyncMqttClient disabled in favor of PubSubClient
-            // if(mqtt_just_connected) {
-            //     mqtt_just_connected = ! // only set to true when publish successful
-            //         device_manager.publish_discovery_info(mqttClient); // needs to happen here not to collide with other publishes
-            // }
             
             // TODO: enable PJON, when UDP works on esp8266 
             // // handle pjon communication
