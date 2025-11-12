@@ -13,9 +13,10 @@
  * ==========================
  * Global variable to track the current MQTT buffer size.
  * Updated whenever a bigger big buffer is allocated.
- * The MQTT client buffer size will be set to this value + overhead for topic/headers.
+ * Note: espMqttClient handles large payloads automatically, so this is mainly
+ * for tracking and logging purposes.
  */
-size_t iotempower_mqtt_buffer_size = 256;  // Default PubSubClient buffer size
+size_t iotempower_mqtt_buffer_size = 256;  // Default buffer size
 
 /**
  * @brief Ensure MQTT buffer is large enough for the required size
